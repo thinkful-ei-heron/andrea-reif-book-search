@@ -51,9 +51,9 @@ export default class SearchBar extends Component {
               title: book.volumeInfo.title,
               authors: book.volumeInfo.authors,
               description: book.volumeInfo.description,
-              price: book.saleInfo.ListPrice
-                ? (this.listPrice = book.saleInfo.listPrice.amount)
-                : (this.listPrice = null),
+              price: book.saleInfo.listPrice
+                ? book.saleInfo.listPrice.amount
+                : null,
               link: book.canonicalVolumeLink,
             };
           });
@@ -64,8 +64,9 @@ export default class SearchBar extends Component {
           books: newBooks,
         });
       })
-      .then(() =>
-        console.log('this.state.books[0].title: ' + this.state.books[0].title)
+      .then(
+        () => this.state.books.forEach(item => console.log(item))
+        // console.log('this.state.books[0].title: ' + this.state.books[0].title)
       )
       .catch(e => console.log(e));
   };
