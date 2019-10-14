@@ -12,7 +12,7 @@ export default class Filters extends Component {
             <option value='magazines'>Magazines</option>
           </select>
           <label htmlFor=''>Book Type:</label>
-          <select id='book-type-select'>
+          <select id='filter-select'>
             <option value='ebooks'>No Filter</option>
             <option value='free-ebooks'>Free</option>
             <option value='full'>Full</option>

@@ -5,12 +5,10 @@ export default class SearchBar extends Component {
   constructor() {
     super();
     this.state = {
-      books: [],
-      loading: false,
       error: null,
       filter: {
         printType: 'all',
-        bookType: 'ebooks',
+        filter: 'ebooks',
       },
     };
   }
@@ -19,10 +17,9 @@ export default class SearchBar extends Component {
     const searchValue = document.getElementById('search').value;
     console.log(searchValue);
     this.setState({
-      loading: true,
       filter: {
         printType: document.getElementById('print-type-select').value,
-        bookType: document.getElementById('book-type-select').value,
+        filter: document.getElementById('filter-select').value,
       },
     });
     this.fetchBooks(searchValue, this.state.filter);
@@ -30,18 +27,18 @@ export default class SearchBar extends Component {
   };
   fetchBooks = searchValue => {
     let printType = this.state.filter.printType;
-    let bookType = this.state.filter.bookType;
+    let filter = this.state.filter.filter;
     let newBooks = [];
     fetch(
       `https://www.googleapis.com/books/v1/volumes?q=${searchValue}&printType=${printType}${
-        bookType !== 'No Filter' ? `&filter=${bookType}` : ''
+        filter !== 'No Filter' ? `&filter=${filter}` : ''
       }`
     )
       .then(res => {
         if (res.ok) {
           return res.json();
         } else {
-          Promise.reject('Aaargh');
+          Promise.reject(this.setState({ error: 'Aaargh' }));
         }
       })
       .then(books => {
@@ -54,25 +51,23 @@ export default class SearchBar extends Component {
               price: book.saleInfo.listPrice
                 ? book.saleInfo.listPrice.amount
                 : null,
-              link: book.canonicalVolumeLink,
+              link: book.volumeInfo.canonicalVolumeLink,
+              image: book.volumeInfo.imageLinks.thumbnail, // idk why eslint/prettier likes trailing commas!
+              id: book.id,
             };
           });
         } else {
-          alert('aaaarrgh');
+          this.setState({ error: 'Aaargh' });
+          alert(this.state.error);
         }
-        this.setState({
-          books: newBooks,
-        });
+        this.props.ParentCallback(newBooks);
       })
-      .then(
-        () => this.state.books.forEach(item => console.log(item))
-        // console.log('this.state.books[0].title: ' + this.state.books[0].title)
-      )
-      .catch(e => console.log(e));
+      .catch(this.setState({ error: 'Aaargh' }));
   };
+
   render() {
     return (
-      <form id='book-search' onSubmit={e => this.handleSubmit(e)}>
+      <form id='book-search' onSubmit={this.handleSubmit}>
         <label htmlFor='search'>Search:</label>
         <input
           type='text'
